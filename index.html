@@ -476,7 +476,7 @@
 </footer>
 
 <script>
-var sys='simflake_epoxy', flake='quarter', topPasses=1, primerChoice='1000hs', metallicFinish='satin';
+var sys='simflake_epoxy', flake='quarter', topPasses=1, primerChoice='1000hs', metallicTopcoat='971eps_satin';
 
 var SYSTEMS={
   simflake_epoxy:   {name:'SimFlake SB 1-Day Epoxy',       tag:'Flake system',             opts:['primer','flake','toppasses']},
@@ -498,7 +498,7 @@ function setFlake(v,el){flake=v;togG('flk',el);
   var ft=document.getElementById('flk-formula');if(ft)ft.textContent='Formula: '+f[v];calc();}
 function setTopPasses(v,el){topPasses=v;togG('tp',el);calc();}
 function setPrimer(v,el){primerChoice=v;togG('pr',el);calc();}
-function setMetallicFinish(v,el){metallicFinish=v;togG('mf',el);calc();}
+function setMetallicTopcoat(v,el){metallicTopcoat=v;togG('mf',el);calc();}
 
 function renderOpts(){
   var opts=SYSTEMS[sys].opts; var h='';
@@ -520,10 +520,10 @@ function renderOpts(){
     topPasses=1;
   }
   if(opts.indexOf('metallic_finish')>-1){
-    h+='<div class="mod-block"><div class="tog-label">971EPS topcoat finish</div>';
-    h+='<div class="tog-wrap" id="mf"><button class="tog on" onclick="setMetallicFinish(\'satin\',this)">Satin</button><button class="tog" onclick="setMetallicFinish(\'gloss\',this)">Gloss</button></div>';
-    h+='<div class="formula-hint">Gloss and satin same coverage rate — 500 sq ft/gal</div></div>';
-    metallicFinish='satin';
+    h+='<div class="mod-block"><div class="tog-label">Topcoat selection</div>';
+    h+='<div class="tog-wrap" id="mf"><button class="tog on" onclick="setMetallicTopcoat(\'971eps_satin\',this)">971EPS Satin</button><button class="tog" onclick="setMetallicTopcoat(\'971eps_gloss\',this)">971EPS Gloss</button><button class="tog" onclick="setMetallicTopcoat(\'hwu\',this)">Simthane HWU</button></div>';
+    h+='<div class="formula-hint">971EPS gloss and satin: 500 sq ft/gal &nbsp;|&nbsp; Simthane HWU: 500 sq ft/gal</div></div>';
+    metallicTopcoat='971eps_satin';
   }
   if(!h) h='<p style="font-size:13px;color:var(--text3)">No adjustable options for this system — fixed build per the 2025 Simiron catalog.</p>';
   document.getElementById('opt-content').innerHTML=h;
@@ -645,7 +645,18 @@ function calc(){
     var mg=Math.ceil(sqft/35);var mk=Math.ceil(mg/3);
     cards.push(C('1100SL + Metallic Additive — metallic decorative layer','Metallic Layer','Clear 1100SL slow cure mixed with metallic additive. Applied 30–48 mils. Estimated at midpoint 35 sq ft/gal (range: 20–50 sq ft/gal depending on thickness and technique).',mg+' gal',mk+' 3-gal kits','20–50 sq ft/gal','Coverage range is wide — order toward the high end on first-time installs.','One 32 oz metallic additive jar per 3-gal kit of 1100SL.'));
     var eg=Math.ceil(sqft/500);
-    cards.push(C('971EPS High Solids Epoxy Siloxane — '+metallicFinish+' topcoat','Topcoat','UV stable, non-yellowing. Superior abrasion, chemical, UV resistance. Non-isocyanate. Same rate for gloss and satin.',eg+' gal (min 1)','Contact Martin for kit size','500 sq ft/gal','',''));
+    var tcName, tcDesc;
+    if(metallicTopcoat==='hwu'){
+      tcName='Simthane HWU — high-wear urethane topcoat';
+      tcDesc='3-component, high solids, low VOC urethane. Satin finish with consistent light texture. Superior abrasion, chemical, UV resistance. 500 sq ft/gal.';
+    } else if(metallicTopcoat==='971eps_gloss'){
+      tcName='971EPS High Solids Epoxy Siloxane — gloss topcoat';
+      tcDesc='UV stable, non-yellowing. Superior abrasion, chemical, UV resistance. Non-isocyanate. 500 sq ft/gal.';
+    } else {
+      tcName='971EPS High Solids Epoxy Siloxane — satin topcoat';
+      tcDesc='UV stable, non-yellowing. Superior abrasion, chemical, UV resistance. Non-isocyanate. 500 sq ft/gal.';
+    }
+    cards.push(C(tcName,'Topcoat',tcDesc,eg+' gal (min 1)','Contact Martin for kit size','500 sq ft/gal','',''));
   }
   else if(sys==='epoxy_siloxane'){
     addPrimerCard(cards,sqft);
@@ -662,8 +673,8 @@ function calc(){
       var bg=Math.ceil(sqft/130);var bk=Math.ceil(bg/3);
       cards.push(C('1100SL 100% Solids Epoxy — light gray base coat','Base Coat','Applied 8–30 mils, 130 sq ft/gal. Light gray per ESD system spec. Kit = 2 gal base + 1 gal activator.',bg+' gal',bk+' 3-gal kits','130 sq ft/gal','',''));
     }
-    var tg=Math.ceil(sqft/500);
-    cards.push(C('Simthane ESD — satin topcoat','Topcoat','Electrostatic dissipative urethane. Resistance 1×10⁶ – &lt;1×10⁹ ohms. Satin, light gray. 500 sq ft/gal.',tg+' gal (min 1)','Contact Martin for kit size','500 sq ft/gal','Contact Martin Palushaj at (248) 720-8708 to confirm Simthane ESD kit sizes before ordering.',''));
+    var tg=Math.ceil(sqft/600);
+    cards.push(C('Simthane ESD — satin topcoat','Topcoat','Electrostatic dissipative urethane. Resistance 1×10⁶ – &lt;1×10⁹ ohms. Satin, light gray. 600 sq ft/gal.',tg+' gal (min 1)','Contact Martin for kit size','600 sq ft/gal','Contact Martin Palushaj at (248) 720-8708 to confirm Simthane ESD kit sizes before ordering.',''));
   }
   else if(sys==='simquartz_db'){
     addPrimerCard(cards,sqft);
@@ -700,7 +711,7 @@ function calc(){
   html+='<div class="rep-footer-left"><strong>Questions on this estimate?</strong><br>Martin Palushaj — Simiron Michigan<br><a href="tel:2487208708">(248) 720-8708</a> &nbsp;·&nbsp; <a href="mailto:Martin@simiron.com">Martin@simiron.com</a></div>';
   html+='<div class="rep-footer-right">Simiron Industrial Coatings<br><a href="https://simiron.com" target="_blank" style="color:var(--accent);text-decoration:none">simiron.com</a></div>';
   html+='</div>';
-  html+='<div class="disclaimer">Coverage rates based on the 2025 Simiron System Guides Catalog and field-verified estimates. All flake quantities sold in 40-lb boxes only — rounded up to whole units. Poly HS 1st coat: 100 sq ft/gal over broadcast. Poly HS 2nd coat: 175 sq ft/gal (150–200 range). 971EPS and Simthane topcoats: 500 sq ft/gal. Metallic layer: 35 sq ft/gal midpoint (20–50 range). All quantities should be confirmed with your Simiron rep before ordering.</div>';
+  html+='<div class="disclaimer">Coverage rates based on the 2025 Simiron System Guides Catalog and field-verified estimates. All flake quantities sold in 40-lb boxes only — rounded up to whole units. Poly HS 1st coat: 100 sq ft/gal over broadcast. Poly HS 2nd coat: 175 sq ft/gal (150–200 range). 971EPS and Simthane HWU topcoats: 500 sq ft/gal. Simthane ESD: 600 sq ft/gal. Metallic layer: 35 sq ft/gal midpoint (20–50 range). All quantities should be confirmed with your Simiron rep before ordering.</div>';
   html+='</div>';
   res.innerHTML=html;
 }
