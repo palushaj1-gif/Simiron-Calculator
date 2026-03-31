@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simiron Material Coverage Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f3f0;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: #e0dbd4;
+    --border2: #ccc7bf;
+    --text: #1a1816;
+    --text2: #6b6560;
+    --text3: #9e9890;
+    --accent: #c8402a;
+    --accent-bg: #fdf2f0;
+    --accent-border: #e8b4aa;
+    --info: #1a5276;
+    --info-bg: #eaf2f8;
+    --info-border: #a9cce3;
+    --warn-bg: #fef9ec;
+    --warn-border: #f0d080;
+    --warn-text: #7d5a00;
+    --success-bg: #edfaf1;
+    --success-border: #a9dfbf;
+    --success-text: #1e6b3c;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--text);
+    color: #fff;
+    padding: 0;
+  }
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 24px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .header-logo {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.5);
+    margin-bottom: 6px;
+  }
+  .header-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,.5);
+    margin-top: 4px;
+  }
+  .rep-pill {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    min-width: 220px;
+  }
+  .rep-pill-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .rep-pill-title {
+    font-size: 11px;
+    color: rgba(255,255,255,.45);
+    margin-bottom: 8px;
+  }
+  .rep-pill-contacts { display: flex; flex-direction: column; gap: 3px; }
+  .rep-pill-contact { font-size: 12px; color: rgba(255,255,255,.6); }
+  .rep-pill-contact a { color: rgba(255,255,255,.85); text-decoration: none; }
+  .rep-pill-contact a:hover { color: #fff; }
+
+  /* MAIN */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 24px 60px;
+  }
+
+  /* STEP CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 14px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .step-badge {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--text);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .card-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+
+  /* INPUT */
+  .sqft-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 20px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    border: 1.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: var(--surface2);
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .sqft-input:focus { border-color: var(--text); }
+  .sqft-input::placeholder { color: var(--text3); font-weight: 400; font-size: 16px; }
+
+  /* SYSTEM GRID */
+  .sys-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  @media(max-width:560px){ .sys-grid { grid-template-columns: 1fr; } }
+
+  .sys-card {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    cursor: pointer;
+    background: var(--surface2);
+    transition: border-color .12s, background .12s;
+  }
+  .sys-card:hover { border-color: var(--border2); }
+  .sys-card.on {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+  .sys-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 3px;
+  }
+  .sys-card.on .sys-tag { color: var(--accent); }
+  .sys-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sys-card.on .sys-name { color: var(--accent); }
+  .sys-build { font-size: 11px; color: var(--text3); margin-top: 3px; line-height: 1.5; }
+  .sys-card.on .sys-build { color: #b05a46; }
+
+  /* TOGGLES */
+  .tog-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .06em; }
+  .tog-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tog {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    border: 1.5px solid var(--border2);
+    border-radius: 99px;
+    cursor: pointer;
+    background: var(--surface2);
+    color: var(--text2);
+    transition: all .12s;
+  }
+  .tog:hover { border-color: var(--text); color: var(--text); }
+  .tog.on { background: var(--text); color: #fff; border-color: var(--text); }
+  .formula-hint { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: 'DM Mono', monospace; }
+
+  /* MOD SECTION */
+  .mod-block {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-top: 12px;
+    background: var(--surface2);
+  }
+
+  /* RESULTS */
+  .results-card {
+    background: var(--surface);
+    border: 1.5px solid var(--text);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 14px;
+  }
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .results-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .results-sqft {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+    color: var(--text);
+  }
+  .sys-banner {
+    background: var(--text);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    margin-top: 14px;
+  }
+
+  /* PRODUCT CARDS */
+  .pcard {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: var(--surface2);
+  }
+  .pcard-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; gap: 8px; }
+  .pname { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+  .pbadge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 99px;
+    background: var(--text);
+    color: #fff;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .pdesc { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.6; }
+
+  .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .stat-v { font-size: 15px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text); }
+  .stat-l { font-size: 10px; color: var(--text3); margin-top: 2px; text-transform: uppercase; letter-spacing: .05em; }
+
+  /* NOTES */
+  .note-warn {
+    font-size: 12px;
+    color: var(--warn-text);
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+  .note-info {
+    font-size: 12px;
+    color: var(--info);
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
+  /* REP FOOTER */
+  .rep-footer {
+    border-top: 1px solid var(--border);
+    margin-top: 18px;
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .rep-footer-left { font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .rep-footer-left strong { color: var(--text); font-weight: 600; }
+  .rep-footer-left a { color: var(--accent); text-decoration: none; }
+  .rep-footer-left a:hover { text-decoration: underline; }
+  .rep-footer-right { font-size: 11px; color: var(--text3); text-align: right; line-height: 1.7; }
+
+  .disclaimer {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    line-height: 1.8;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text3);
+    font-size: 14px;
+  }
+  .empty-icon { font-size: 32px; margin-bottom: 10px; opacity: .4; }
+
+  /* FOOTER */
+  .site-footer {
+    background: var(--text);
+    color: rgba(255,255,255,.4);
+    text-align: center;
+    font-size: 11px;
+    padding: 20px;
+    letter-spacing: .04em;
+  }
+  .site-footer a { color: rgba(255,255,255,.6); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div>
+      <div class="header-logo">Simiron Industrial Coatings</div>
+      <div class="header-title">Material Coverage Calculator</div>
+      <div class="header-sub">2025 System Guides Catalog — Field-verified estimates</div>
+    </div>
+    <div class="rep-pill">
+      <div class="rep-pill-name">Martin Palushaj</div>
+      <div class="rep-pill-title">Regional Sales Manager — Michigan</div>
+      <div class="rep-pill-contacts">
+        <div class="rep-pill-contact"><a href="tel:2487208708">(248) 720-8708</a></div>
+        <div class="rep-pill-contact"><a href="mailto:Martin@simiron.com">Martin@simiron.com</a></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- STEP 1 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">1</div>
+      <div>
+        <div class="card-title">Square footage</div>
+      </div>
+    </div>
+    <input class="sqft-input" type="number" id="sqft" placeholder="Enter project square footage" min="1" oninput="calc()">
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">2</div>
+      <div>
+        <div class="card-title">Select system</div>
+        <div class="card-sub">2025 Simiron System Guides Catalog</div>
+      </div>
+    </div>
+    <div class="sys-grid" id="sys-grid">
+      <div class="sys-card on" onclick="setSys('simflake_epoxy',this)">
+        <div class="sys-tag">Flake system</div>
+        <div class="sys-name">SimFlake SB 1-Day Epoxy</div>
+        <div class="sys-build">1150FC + chip broadcast + Poly HS</div>
+      </div>
+      <div class="sys-card" onclick="setSys('simflake_polyurea',this)">
+        <div class="sys-tag">Flake system</div>
+        <div class="sys-name">SimFlake SB 1-Day Polyurea</div>
+        <div class="sys-build">Polyurea base + chip + Poly HS</div>
+      </div>
+      <div class="sys-card" onclick="setSys('hb_epoxy',this)">
+        <div class="sys-tag">Solid color</div>
+        <div class="sys-name">SimFloor HB-Epoxy</div>
+        <div class="sys-build">Primer + 1100SL topcoat</div>
+      </div>
+      <div class="sys-card" onclick="setSys('hwu',this)">
+        <div class="sys-tag">High-wear urethane</div>
+        <div class="sys-name">SimFloor HWU</div>
+        <div class="sys-build">Primer + 1100SL + Simthane HWU</div>
+      </div>
+      <div class="sys-card" onclick="setSys('shop_floor',this)">
+        <div class="sys-tag">Silica sand broadcast</div>
+        <div class="sys-name">Shop Floor</div>
+        <div class="sys-build">Primer + 1100SL + silica sand + Poly HS</div>
+      </div>
+      <div class="sys-card" onclick="setSys('metallic',this)">
+        <div class="sys-tag">Decorative metallic</div>
+        <div class="sys-name">SimFloor Metallic</div>
+        <div class="sys-build">1000HS + 1100SL pigmented + 1100SL metallic + 971EPS</div>
+      </div>
+      <div class="sys-card" onclick="setSys('epoxy_siloxane',this)">
+        <div class="sys-tag">Chemical resistant</div>
+        <div class="sys-name">SimFloor Epoxy Siloxane</div>
+        <div class="sys-build">Primer + 1100SL + 971EPS topcoat</div>
+      </div>
+      <div class="sys-card" onclick="setSys('esd',this)">
+        <div class="sys-tag">Electrostatic dissipative</div>
+        <div class="sys-name">SimFloor ESD</div>
+        <div class="sys-build">1000HS + 1100SL light gray + Simthane ESD</div>
+      </div>
+      <div class="sys-card" onclick="setSys('simquartz_db',this)">
+        <div class="sys-tag">Double broadcast quartz</div>
+        <div class="sys-name">SimQuartz DB</div>
+        <div class="sys-build">1000HS + 2× 1100SL quartz broadcast + Poly HS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">3</div>
+      <div>
+        <div class="card-title">Options</div>
+        <div class="card-sub">Adjust system components</div>
+      </div>
+    </div>
+    <div id="opt-content"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-icon">⬆</div>
+        Enter square footage and select a system above to generate your material list.
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <a href="https://simiron.com" target="_blank">simiron.com</a> &nbsp;·&nbsp; Coverage estimates based on 2025 Simiron System Guides Catalog &nbsp;·&nbsp; Contact Martin Palushaj for ordering
+</footer>
+
+<script>
+var sys='simflake_epoxy', flake='quarter', topPasses=1, primerChoice='1000hs', metallicFinish='satin';
+
+var SYSTEMS={
+  simflake_epoxy:   {name:'SimFlake SB 1-Day Epoxy',       tag:'Flake system',             opts:['flake','toppasses']},
+  simflake_polyurea:{name:'SimFlake SB 1-Day Polyurea',     tag:'Flake system',             opts:['flake','toppasses']},
+  hb_epoxy:         {name:'SimFloor HB-Epoxy',               tag:'Solid color',              opts:['primer']},
+  hwu:              {name:'SimFloor HWU',                    tag:'High-wear urethane',       opts:['primer']},
+  shop_floor:       {name:'Shop Floor',                      tag:'Silica sand broadcast',    opts:['primer','toppasses']},
+  metallic:         {name:'SimFloor Metallic',               tag:'Decorative metallic',      opts:['metallic_finish']},
+  epoxy_siloxane:   {name:'SimFloor Epoxy Siloxane',         tag:'Chemical resistant',       opts:['primer']},
+  esd:              {name:'SimFloor ESD',                    tag:'Electrostatic dissipative',opts:[]},
+  simquartz_db:     {name:'SimQuartz DB',                    tag:'Double broadcast quartz',  opts:['primer','toppasses']},
+};
+
+function togG(g,el){document.querySelectorAll('#'+g+' .tog').forEach(function(b){b.classList.remove('on')});el.classList.add('on');}
+function sysTog(el){document.querySelectorAll('#sys-grid .sys-card').forEach(function(c){c.classList.remove('on')});el.classList.add('on');}
+function setSys(v,el){sys=v;sysTog(el);renderOpts();calc();}
+function setFlake(v,el){flake=v;togG('flk',el);
+  var f={quarter:'sq ft ÷ 6 ÷ 40 = boxes',eighth:'sq ft ÷ 4 ÷ 40 = boxes',sixteenth:'sq ft × 1 lb ÷ 40 = boxes (double broadcast)'};
+  var ft=document.getElementById('flk-formula');if(ft)ft.textContent='Formula: '+f[v];calc();}
+function setTopPasses(v,el){topPasses=v;togG('tp',el);calc();}
+function setPrimer(v,el){primerChoice=v;togG('pr',el);calc();}
+function setMetallicFinish(v,el){metallicFinish=v;togG('mf',el);calc();}
+
+function renderOpts(){
+  var opts=SYSTEMS[sys].opts; var h='';
+  if(opts.indexOf('flake')>-1){
+    h+='<div class="mod-block"><div class="tog-label">Flake size — full broadcast to rejection, sold in 40-lb boxes only</div>';
+    h+='<div class="tog-wrap" id="flk"><button class="tog on" onclick="setFlake(\'quarter\',this)">1/4"</button><button class="tog" onclick="setFlake(\'eighth\',this)">1/8"</button><button class="tog" onclick="setFlake(\'sixteenth\',this)">1/16" microchip</button></div>';
+    h+='<div class="formula-hint" id="flk-formula">Formula: sq ft ÷ 6 ÷ 40 = boxes (rounded up)</div></div>';
+    flake='quarter';
+  }
+  if(opts.indexOf('primer')>-1){
+    h+='<div class="mod-block"><div class="tog-label">Primer selection</div>';
+    h+='<div class="tog-wrap" id="pr"><button class="tog on" onclick="setPrimer(\'1000hs\',this)">1000HS epoxy primer</button><button class="tog" onclick="setPrimer(\'1100sl\',this)">1100SL — combined primer + base</button><button class="tog" onclick="setPrimer(\'mvb\',this)">MVB — moisture vapor barrier</button></div></div>';
+    primerChoice='1000hs';
+  }
+  if(opts.indexOf('toppasses')>-1){
+    h+='<div class="mod-block"><div class="tog-label">Polyaspartic HS topcoat passes</div>';
+    h+='<div class="tog-wrap" id="tp"><button class="tog on" onclick="setTopPasses(1,this)">1 coat</button><button class="tog" onclick="setTopPasses(2,this)">2 coats</button></div>';
+    h+='<div class="formula-hint">1st coat: 100 sq ft/gal over broadcast &nbsp;|&nbsp; 2nd coat: 175 sq ft/gal over sealed surface (150–200 range)</div></div>';
+    topPasses=1;
+  }
+  if(opts.indexOf('metallic_finish')>-1){
+    h+='<div class="mod-block"><div class="tog-label">971EPS topcoat finish</div>';
+    h+='<div class="tog-wrap" id="mf"><button class="tog on" onclick="setMetallicFinish(\'satin\',this)">Satin</button><button class="tog" onclick="setMetallicFinish(\'gloss\',this)">Gloss</button></div>';
+    h+='<div class="formula-hint">Gloss and satin same coverage rate — 500 sq ft/gal</div></div>';
+    metallicFinish='satin';
+  }
+  if(!h) h='<p style="font-size:13px;color:var(--text3)">No adjustable options for this system — fixed build per the 2025 Simiron catalog.</p>';
+  document.getElementById('opt-content').innerHTML=h;
+}
+
+function C(name,badge,desc,a,b,c,w,i){return{name:name,badge:badge,desc:desc,a:a,b:b,c:c,w:w,i:i};}
+
+function addFlakeCard(cards,sqft){
+  var boxes,lbs,formula,label,warn='';
+  if(flake==='quarter'){boxes=Math.ceil((sqft/6)/40);lbs=boxes*40;formula='sq ft ÷ 6 ÷ 40';label='1/4"';}
+  else if(flake==='eighth'){boxes=Math.ceil((sqft/4)/40);lbs=boxes*40;formula='sq ft ÷ 4 ÷ 40';label='1/8"';warn='1/8" is special order — confirm availability with Martin before committing to the customer.';}
+  else{boxes=Math.ceil(sqft/40);lbs=boxes*40;formula='sq ft × 1 lb ÷ 40';label='1/16" microchip';warn='1/16" is special order and requires a double broadcast — two separate passes required. Confirm availability with Martin before ordering.';}
+  cards.push(C('Simiron decorative chip flakes — '+label,'Broadcast',
+    'Full broadcast to rejection. Sold in 40-lb boxes only. Toss flake into air — do not dump. Sweep/blow excess after cure and reclaim for reuse.',
+    lbs+' lbs',boxes+' 40-lb boxes',formula,warn,
+    'Broadcast immediately into wet base coat while surface is still open.'));
+}
+
+function addPolyTop(cards,sqft){
+  if(topPasses===1){
+    var g=Math.ceil(sqft/100);var k=Math.ceil(g/2);
+    cards.push(C('Polyaspartic HS — clear topcoat','Topcoat',
+      '1 coat at 10–16 mils. UV stable, non-yellowing. Select cure speed: Fast Cure (&lt;60°F), Medium (standard), Slow Cure (hot/humid &gt;75°F).',
+      g+' gal',k+' 2-gal kits','100 sq ft/gal','',''));
+  } else {
+    var g1=Math.ceil(sqft/100);
+    var g2=Math.ceil(sqft/175);
+    var gT=g1+g2;var kT=Math.ceil(gT/2);
+    cards.push(C('Polyaspartic HS — clear topcoat (2 coats)','Topcoat',
+      '1st coat over broadcast: 100 sq ft/gal. 2nd coat over sealed surface: 175 sq ft/gal (150–200 sq ft/gal range). UV stable, non-yellowing.',
+      gT+' gal total',kT+' 2-gal kits','1st: 100 | 2nd: 175 sq ft/gal',
+      'Apply 2nd coat within 24-hr recoat window. Missed window requires sanding before recoating.',
+      '1st coat: '+g1+' gal ('+Math.ceil(g1/2)+' kits) &nbsp;|&nbsp; 2nd coat: '+g2+' gal ('+Math.ceil(g2/2)+' kits)'));
+  }
+}
+
+function addPrimerCard(cards,sqft){
+  var hasPr=SYSTEMS[sys].opts.indexOf('primer')>-1;
+  var pc=hasPr?primerChoice:'1000hs';
+  if(pc==='1100sl'){
+    var g=Math.ceil(sqft/90);var k=Math.ceil(g/3);
+    cards.push(C('1100SL 100% Solids Epoxy — combined primer + base coat','Primer + Base',
+      'Estimated at 90 sq ft/gal — covers primer coat, full base coat, and patch material with fumed silica. Kit = 2 gal base + 1 gal activator.',
+      g+' gal',k+' 3-gal kits','90 sq ft/gal',
+      'Kit qty rounded up — overage covers touch-up and patching with fumed silica.',''));
+  } else if(pc==='mvb'){
+    var g=Math.ceil(sqft/80);var k=Math.ceil(g/1.5);
+    cards.push(C('MVB Moisture Vapor Barrier — primer','MVB Primer',
+      'Estimated at 80 sq ft/gal — skim coat first pass + 16 mil build coat + patch allowance. Controls MVT up to 25 lbs/1000 sq ft/24hr.',
+      g+' gal',Math.ceil(k)+' 1.5-gal kits','80 sq ft/gal',
+      'MVB required when MVT exceeds 3 lbs/1000 sq ft/24hr (ASTM F1869) or 75% RH (F2170). Do not split kits. Always moisture-test first.',''));
+  } else {
+    var g=Math.ceil(sqft/300);var k=Math.ceil(g/1.5);
+    cards.push(C('1000HS 100% Solids Epoxy Primer','Primer',
+      'Applied 3–8 mils. Low viscosity, excellent surface penetration. 300 sq ft/gal working estimate. Sold in 1.5-gal kits.',
+      g+' gal',Math.ceil(k)+' 1.5-gal kits','300 sq ft/gal','',''));
+  }
+}
+
+function calc(){
+  var sqft=parseFloat(document.getElementById('sqft').value)||0;
+  var res=document.getElementById('results');
+  if(!sqft||sqft<=0){
+    res.innerHTML='<div class="card"><div class="empty-state"><div class="empty-icon">⬆</div>Enter square footage above to generate your material list.</div></div>';
+    return;
+  }
+  var cards=[];
+  var s=SYSTEMS[sys];
+
+  if(sys==='simflake_epoxy'){
+    var g=Math.ceil(sqft/100);var k=Math.ceil(g/3);
+    cards.push(C('1150FC Fast Cure Epoxy — primer + base coat','Primer + Base','Combined primer and base in one pass at 16 mils / 100 sq ft/gal. Resists MVT up to 12 lbs/1000 sq ft. Must be broadcasted into while wet. Kit = 2 gal base + 1 gal activator.',g+' gal',k+' 3-gal kits','100 sq ft/gal @ 16 mils','','Broadcast chip immediately into wet 1150FC — material skins quickly.'));
+    addFlakeCard(cards,sqft);addPolyTop(cards,sqft);
+  }
+  else if(sys==='simflake_polyurea'){
+    cards.push(C('Polyurea Base Coat','Primer + Base','Polyurea basecoat pigmented and broadcasted into with decorative chip. Contact Martin for coverage rate confirmation on your specific polyurea product.','—','Contact Martin','Per product spec','Contact Martin Palushaj at (248) 720-8708 or Martin@simiron.com to confirm polyurea base coverage rate before ordering.',''));
+    addFlakeCard(cards,sqft);addPolyTop(cards,sqft);
+  }
+  else if(sys==='hb_epoxy'){
+    addPrimerCard(cards,sqft);
+    if(primerChoice!=='1100sl'){
+      var g=Math.ceil(sqft/130);var k=Math.ceil(g/3);
+      cards.push(C('1100SL 100% Solids Epoxy — finish coat','Finish Coat','High-build, self-leveling. Applied 8–30 mils, 130 sq ft/gal. Add U-Tint pigment pack for color. Kit = 2 gal base + 1 gal activator.',g+' gal',k+' 3-gal kits','130 sq ft/gal','System may yellow over time — not aliphatic. Not recommended for UV-exposed areas.',''));
+    }
+  }
+  else if(sys==='hwu'){
+    addPrimerCard(cards,sqft);
+    if(primerChoice!=='1100sl'){
+      var g=Math.ceil(sqft/130);var k=Math.ceil(g/3);
+      cards.push(C('1100SL 100% Solids Epoxy — base coat','Base Coat','Applied 8–12 mils, 130 sq ft/gal. Kit = 2 gal base + 1 gal activator.',g+' gal',k+' 3-gal kits','130 sq ft/gal','',''));
+    }
+    var tg=Math.ceil(sqft/500);
+    cards.push(C('Simthane HWU — high-wear urethane topcoat','Topcoat','3-component, high solids, low VOC urethane. Satin finish with consistent light texture. Superior abrasion, chemical, UV resistance.',tg+' gal (min 1)','Contact Martin for kit size','500 sq ft/gal','','Contact Martin Palushaj to confirm Simthane HWU kit sizes before ordering.'));
+  }
+  else if(sys==='shop_floor'){
+    addPrimerCard(cards,sqft);
+    if(primerChoice!=='1100sl'){
+      var g=Math.ceil(sqft/90);var k=Math.ceil(g/3);
+      cards.push(C('1100SL 100% Solids Epoxy — base coat + silica broadcast','Base + Broadcast','Pigmented 1100SL applied and silica broadcasted into while wet. 90 sq ft/gal includes base coat and patch allowance. Kit = 2 gal base + 1 gal activator.',g+' gal',k+' 3-gal kits','90 sq ft/gal','','Broadcast silica immediately into wet 1100SL.'));
+    }
+    var lbs=Math.ceil(sqft);var bags=Math.ceil(lbs/50);
+    cards.push(C('Silica sand — broadcast','Broadcast','Applied at 1 lb/sq ft broadcast to rejection. Sold in 50-lb bags.',lbs+' lbs',bags+' 50-lb bags','1 lb/sq ft','Confirm mesh size with Martin — typically #30 medium or #80 fine for shop floor texture.',''));
+    addPolyTop(cards,sqft);
+  }
+  else if(sys==='metallic'){
+    var pg=Math.ceil(sqft/300);var pk=Math.ceil(pg/1.5);
+    cards.push(C('1000HS 100% Solids Epoxy Primer — clear','Primer','Applied 3–8 mils. Low viscosity, excellent surface penetration. 300 sq ft/gal. Sold in 1.5-gal kits.',pg+' gal',Math.ceil(pk)+' 1.5-gal kits','300 sq ft/gal','',''));
+    var bg=Math.ceil(sqft/90);var bk=Math.ceil(bg/3);
+    cards.push(C('1100SL 100% Solids Epoxy — pigmented base coat','Base Coat','Pigmented with U-Tint. Use dark base (black, gray) for most metallics — white/light for lighter metallic colors. 90 sq ft/gal accounts for base coat and patch material. Kit = 2 gal base + 1 gal activator.',bg+' gal',bk+' 3-gal kits','90 sq ft/gal','','Use slow cure 1100SL for metallic layer — extended open time is critical for manipulation.'));
+    var mg=Math.ceil(sqft/35);var mk=Math.ceil(mg/3);
+    cards.push(C('1100SL + Metallic Additive — metallic decorative layer','Metallic Layer','Clear 1100SL slow cure mixed with metallic additive. Applied 30–48 mils. Estimated at midpoint 35 sq ft/gal (range: 20–50 sq ft/gal depending on thickness and technique).',mg+' gal',mk+' 3-gal kits','20–50 sq ft/gal','Coverage range is wide — order toward the high end on first-time installs.','One 32 oz metallic additive jar per 3-gal kit of 1100SL.'));
+    var eg=Math.ceil(sqft/500);
+    cards.push(C('971EPS High Solids Epoxy Siloxane — '+metallicFinish+' topcoat','Topcoat','UV stable, non-yellowing. Superior abrasion, chemical, UV resistance. Non-isocyanate. Same rate for gloss and satin.',eg+' gal (min 1)','Contact Martin for kit size','500 sq ft/gal','',''));
+  }
+  else if(sys==='epoxy_siloxane'){
+    addPrimerCard(cards,sqft);
+    if(primerChoice!=='1100sl'){
+      var g=Math.ceil(sqft/130);var k=Math.ceil(g/3);
+      cards.push(C('1100SL 100% Solids Epoxy — base coat','Base Coat','Applied 8–30 mils, 130 sq ft/gal. Kit = 2 gal base + 1 gal activator.',g+' gal',k+' 3-gal kits','130 sq ft/gal','',''));
+    }
+    var eg=Math.ceil(sqft/500);
+    cards.push(C('971EPS High Solids Epoxy Siloxane — satin topcoat','Topcoat','UV stable, low VOC, chemical resistant. Non-isocyanate. 500 sq ft/gal gloss or satin — same rate.',eg+' gal (min 1)','Contact Martin for kit size','500 sq ft/gal','',''));
+  }
+  else if(sys==='esd'){
+    var pg=Math.ceil(sqft/300);var pk=Math.ceil(pg/1.5);
+    cards.push(C('1000HS 100% Solids Epoxy Primer — clear','Primer','Applied 3–8 mils, 300 sq ft/gal. Sold in 1.5-gal kits.',pg+' gal',Math.ceil(pk)+' 1.5-gal kits','300 sq ft/gal','',''));
+    var bg=Math.ceil(sqft/130);var bk=Math.ceil(bg/3);
+    cards.push(C('1100SL 100% Solids Epoxy — light gray base coat','Base Coat','Applied 8–30 mils, 130 sq ft/gal. Light gray per ESD system spec. Kit = 2 gal base + 1 gal activator.',bg+' gal',bk+' 3-gal kits','130 sq ft/gal','',''));
+    var tg=Math.ceil(sqft/500);
+    cards.push(C('Simthane ESD — satin topcoat','Topcoat','Electrostatic dissipative urethane. Resistance 1×10⁶ – &lt;1×10⁹ ohms. Satin, light gray. 500 sq ft/gal.',tg+' gal (min 1)','Contact Martin for kit size','500 sq ft/gal','Contact Martin Palushaj at (248) 720-8708 to confirm Simthane ESD kit sizes before ordering.',''));
+  }
+  else if(sys==='simquartz_db'){
+    addPrimerCard(cards,sqft);
+    if(primerChoice!=='1100sl'){
+      var b1g=Math.ceil(sqft/130);var b1k=Math.ceil(b1g/3);
+      cards.push(C('1100SL — 1st base coat + quartz broadcast (pigmented)','1st Broadcast Layer','Pigmented 1100SL broadcasted into with decorative quartz to rejection. 130 sq ft/gal. Kit = 2 gal base + 1 gal activator.',b1g+' gal',b1k+' 3-gal kits','130 sq ft/gal','','Broadcast quartz to rejection immediately into wet epoxy.'));
+    }
+    var b2g=Math.ceil(sqft/130);var b2k=Math.ceil(b2g/3);
+    cards.push(C('1100SL — 2nd base coat + quartz broadcast (clear)','2nd Broadcast Layer','Clear 1100SL applied over 1st broadcast, broadcasted again to rejection with decorative quartz. 130 sq ft/gal.',b2g+' gal',b2k+' 3-gal kits','130 sq ft/gal','','Apply within recoat window before 1st coat fully cures.'));
+    var qlbs=Math.ceil(sqft*2);var qbags=Math.ceil(qlbs/50);
+    cards.push(C('Decorative quartz — double broadcast','Broadcast','Two full broadcast layers at 1 lb/sq ft each = 2 lbs/sq ft total. Sold in 50-lb bags. Have full quantity on site before starting.',qlbs+' lbs',qbags+' 50-lb bags','2 lbs/sq ft total','Confirm quartz blend and color with Martin before ordering.',''));
+    addPolyTop(cards,sqft);
+  }
+
+  // RENDER
+  var html='<div class="results-card">';
+  html+='<div class="results-header"><span class="results-label">Material list</span><span class="results-sqft">'+Number(sqft).toLocaleString()+' sq ft</span></div>';
+  html+='<div class="sys-banner">'+s.name+' — '+s.tag+'</div>';
+
+  cards.forEach(function(c){
+    html+='<div class="pcard"><div class="pcard-top"><div class="pname">'+c.name+'</div><div class="pbadge">'+c.badge+'</div></div>';
+    html+='<div class="pdesc">'+c.desc+'</div>';
+    html+='<div class="stats">';
+    html+='<div class="stat"><div class="stat-v">'+c.a+'</div><div class="stat-l">Total needed</div></div>';
+    html+='<div class="stat"><div class="stat-v">'+c.b+'</div><div class="stat-l">Order qty</div></div>';
+    html+='<div class="stat"><div class="stat-v" style="font-size:11px;font-family:\'DM Mono\',monospace;padding:2px">'+c.c+'</div><div class="stat-l">Rate / formula</div></div>';
+    html+='</div>';
+    if(c.w) html+='<div class="note-warn">'+c.w+'</div>';
+    if(c.i) html+='<div class="note-info">'+c.i+'</div>';
+    html+='</div>';
+  });
+
+  html+='<div class="rep-footer">';
+  html+='<div class="rep-footer-left"><strong>Questions on this estimate?</strong><br>Martin Palushaj — Simiron Michigan<br><a href="tel:2487208708">(248) 720-8708</a> &nbsp;·&nbsp; <a href="mailto:Martin@simiron.com">Martin@simiron.com</a></div>';
+  html+='<div class="rep-footer-right">Simiron Industrial Coatings<br><a href="https://simiron.com" target="_blank" style="color:var(--accent);text-decoration:none">simiron.com</a></div>';
+  html+='</div>';
+  html+='<div class="disclaimer">Coverage rates based on the 2025 Simiron System Guides Catalog and field-verified estimates. All flake quantities sold in 40-lb boxes only — rounded up to whole units. Poly HS 1st coat: 100 sq ft/gal over broadcast. Poly HS 2nd coat: 175 sq ft/gal (150–200 range). 971EPS and Simthane topcoats: 500 sq ft/gal. Metallic layer: 35 sq ft/gal midpoint (20–50 range). All quantities should be confirmed with your Simiron rep before ordering.</div>';
+  html+='</div>';
+  res.innerHTML=html;
+}
+
+renderOpts();
+</script>
+</body>
+</html>
