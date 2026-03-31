@@ -479,14 +479,14 @@
 var sys='simflake_epoxy', flake='quarter', topPasses=1, primerChoice='1000hs', metallicFinish='satin';
 
 var SYSTEMS={
-  simflake_epoxy:   {name:'SimFlake SB 1-Day Epoxy',       tag:'Flake system',             opts:['flake','toppasses']},
-  simflake_polyurea:{name:'SimFlake SB 1-Day Polyurea',     tag:'Flake system',             opts:['flake','toppasses']},
+  simflake_epoxy:   {name:'SimFlake SB 1-Day Epoxy',       tag:'Flake system',             opts:['primer','flake','toppasses']},
+  simflake_polyurea:{name:'SimFlake SB 1-Day Polyurea',     tag:'Flake system',             opts:['primer','flake','toppasses']},
   hb_epoxy:         {name:'SimFloor HB-Epoxy',               tag:'Solid color',              opts:['primer']},
   hwu:              {name:'SimFloor HWU',                    tag:'High-wear urethane',       opts:['primer']},
   shop_floor:       {name:'Shop Floor',                      tag:'Silica sand broadcast',    opts:['primer','toppasses']},
-  metallic:         {name:'SimFloor Metallic',               tag:'Decorative metallic',      opts:['metallic_finish']},
+  metallic:         {name:'SimFloor Metallic',               tag:'Decorative metallic',      opts:['primer','metallic_finish']},
   epoxy_siloxane:   {name:'SimFloor Epoxy Siloxane',         tag:'Chemical resistant',       opts:['primer']},
-  esd:              {name:'SimFloor ESD',                    tag:'Electrostatic dissipative',opts:[]},
+  esd:              {name:'SimFloor ESD',                    tag:'Electrostatic dissipative',opts:['primer']},
   simquartz_db:     {name:'SimQuartz DB',                    tag:'Double broadcast quartz',  opts:['primer','toppasses']},
 };
 
@@ -565,10 +565,11 @@ function addPrimerCard(cards,sqft){
   var pc=hasPr?primerChoice:'1000hs';
   if(pc==='1100sl'){
     var g=Math.ceil(sqft/90);var k=Math.ceil(g/3);
+    var note=(sys==='simflake_epoxy'||sys==='simflake_polyurea'||sys==='shop_floor'||sys==='simquartz_db')
+      ?'When using 1100SL as combined primer + base on a broadcast system, it replaces the separate base coat — broadcast directly into the wet 1100SL.':'Kit qty rounded up — overage covers touch-up and patching with fumed silica.';
     cards.push(C('1100SL 100% Solids Epoxy — combined primer + base coat','Primer + Base',
       'Estimated at 90 sq ft/gal — covers primer coat, full base coat, and patch material with fumed silica. Kit = 2 gal base + 1 gal activator.',
-      g+' gal',k+' 3-gal kits','90 sq ft/gal',
-      'Kit qty rounded up — overage covers touch-up and patching with fumed silica.',''));
+      g+' gal',k+' 3-gal kits','90 sq ft/gal',note,''));
   } else if(pc==='mvb'){
     var g=Math.ceil(sqft/80);var k=Math.ceil(g/1.5);
     cards.push(C('MVB Moisture Vapor Barrier — primer','MVB Primer',
@@ -594,12 +595,16 @@ function calc(){
   var s=SYSTEMS[sys];
 
   if(sys==='simflake_epoxy'){
-    var g=Math.ceil(sqft/100);var k=Math.ceil(g/3);
-    cards.push(C('1150FC Fast Cure Epoxy — primer + base coat','Primer + Base','Combined primer and base in one pass at 16 mils / 100 sq ft/gal. Resists MVT up to 12 lbs/1000 sq ft. Must be broadcasted into while wet. Kit = 2 gal base + 1 gal activator.',g+' gal',k+' 3-gal kits','100 sq ft/gal @ 16 mils','','Broadcast chip immediately into wet 1150FC — material skins quickly.'));
+    addPrimerCard(cards,sqft);
+    if(primerChoice==='1000hs'||primerChoice==='mvb'){
+      var g=Math.ceil(sqft/100);var k=Math.ceil(g/3);
+      cards.push(C('1150FC Fast Cure Epoxy — base coat','Base Coat','Applied at 16 mils / 100 sq ft/gal over primer. Must be broadcasted into while wet. Kit = 2 gal base + 1 gal activator.',g+' gal',k+' 3-gal kits','100 sq ft/gal @ 16 mils','','Broadcast chip immediately into wet 1150FC — material skins quickly.'));
+    }
     addFlakeCard(cards,sqft);addPolyTop(cards,sqft);
   }
   else if(sys==='simflake_polyurea'){
-    cards.push(C('Polyurea Base Coat','Primer + Base','Polyurea basecoat pigmented and broadcasted into with decorative chip. Contact Martin for coverage rate confirmation on your specific polyurea product.','—','Contact Martin','Per product spec','Contact Martin Palushaj at (248) 720-8708 or Martin@simiron.com to confirm polyurea base coverage rate before ordering.',''));
+    addPrimerCard(cards,sqft);
+    cards.push(C('Polyurea Base Coat','Base Coat','Polyurea basecoat pigmented and broadcasted into with decorative chip. Contact Martin for coverage rate confirmation on your specific polyurea product.','—','Contact Martin','Per product spec','Contact Martin Palushaj at (248) 720-8708 or Martin@simiron.com to confirm polyurea base coverage rate before ordering.',''));
     addFlakeCard(cards,sqft);addPolyTop(cards,sqft);
   }
   else if(sys==='hb_epoxy'){
@@ -629,10 +634,14 @@ function calc(){
     addPolyTop(cards,sqft);
   }
   else if(sys==='metallic'){
-    var pg=Math.ceil(sqft/300);var pk=Math.ceil(pg/1.5);
-    cards.push(C('1000HS 100% Solids Epoxy Primer — clear','Primer','Applied 3–8 mils. Low viscosity, excellent surface penetration. 300 sq ft/gal. Sold in 1.5-gal kits.',pg+' gal',Math.ceil(pk)+' 1.5-gal kits','300 sq ft/gal','',''));
-    var bg=Math.ceil(sqft/90);var bk=Math.ceil(bg/3);
-    cards.push(C('1100SL 100% Solids Epoxy — pigmented base coat','Base Coat','Pigmented with U-Tint. Use dark base (black, gray) for most metallics — white/light for lighter metallic colors. 90 sq ft/gal accounts for base coat and patch material. Kit = 2 gal base + 1 gal activator.',bg+' gal',bk+' 3-gal kits','90 sq ft/gal','','Use slow cure 1100SL for metallic layer — extended open time is critical for manipulation.'));
+    addPrimerCard(cards,sqft);
+    if(primerChoice==='1000hs'||primerChoice==='mvb'){
+      var bg=Math.ceil(sqft/130);var bk=Math.ceil(bg/3);
+      cards.push(C('1100SL 100% Solids Epoxy — pigmented base coat','Base Coat','Pigmented with U-Tint. Use dark base (black, gray) for most metallics — white/light for lighter metallic colors. 130 sq ft/gal over primer. Kit = 2 gal base + 1 gal activator.',bg+' gal',bk+' 3-gal kits','130 sq ft/gal','','Use slow cure 1100SL for metallic layer — extended open time is critical for manipulation.'));
+    } else {
+      // 1100SL combo at 90 already covers primer+base, pigmented note
+      cards.push(C('Note — pigment your 1100SL base coat','Base Coat','When using 1100SL as combined primer + base for metallic systems, pigment with U-Tint. Use dark base (black, gray) for most metallics — white/light for lighter metallic colors.','Included above','—','See primer + base card','',''));
+    }
     var mg=Math.ceil(sqft/35);var mk=Math.ceil(mg/3);
     cards.push(C('1100SL + Metallic Additive — metallic decorative layer','Metallic Layer','Clear 1100SL slow cure mixed with metallic additive. Applied 30–48 mils. Estimated at midpoint 35 sq ft/gal (range: 20–50 sq ft/gal depending on thickness and technique).',mg+' gal',mk+' 3-gal kits','20–50 sq ft/gal','Coverage range is wide — order toward the high end on first-time installs.','One 32 oz metallic additive jar per 3-gal kit of 1100SL.'));
     var eg=Math.ceil(sqft/500);
@@ -648,10 +657,11 @@ function calc(){
     cards.push(C('971EPS High Solids Epoxy Siloxane — satin topcoat','Topcoat','UV stable, low VOC, chemical resistant. Non-isocyanate. 500 sq ft/gal gloss or satin — same rate.',eg+' gal (min 1)','Contact Martin for kit size','500 sq ft/gal','',''));
   }
   else if(sys==='esd'){
-    var pg=Math.ceil(sqft/300);var pk=Math.ceil(pg/1.5);
-    cards.push(C('1000HS 100% Solids Epoxy Primer — clear','Primer','Applied 3–8 mils, 300 sq ft/gal. Sold in 1.5-gal kits.',pg+' gal',Math.ceil(pk)+' 1.5-gal kits','300 sq ft/gal','',''));
-    var bg=Math.ceil(sqft/130);var bk=Math.ceil(bg/3);
-    cards.push(C('1100SL 100% Solids Epoxy — light gray base coat','Base Coat','Applied 8–30 mils, 130 sq ft/gal. Light gray per ESD system spec. Kit = 2 gal base + 1 gal activator.',bg+' gal',bk+' 3-gal kits','130 sq ft/gal','',''));
+    addPrimerCard(cards,sqft);
+    if(primerChoice!=='1100sl'){
+      var bg=Math.ceil(sqft/130);var bk=Math.ceil(bg/3);
+      cards.push(C('1100SL 100% Solids Epoxy — light gray base coat','Base Coat','Applied 8–30 mils, 130 sq ft/gal. Light gray per ESD system spec. Kit = 2 gal base + 1 gal activator.',bg+' gal',bk+' 3-gal kits','130 sq ft/gal','',''));
+    }
     var tg=Math.ceil(sqft/500);
     cards.push(C('Simthane ESD — satin topcoat','Topcoat','Electrostatic dissipative urethane. Resistance 1×10⁶ – &lt;1×10⁹ ohms. Satin, light gray. 500 sq ft/gal.',tg+' gal (min 1)','Contact Martin for kit size','500 sq ft/gal','Contact Martin Palushaj at (248) 720-8708 to confirm Simthane ESD kit sizes before ordering.',''));
   }
